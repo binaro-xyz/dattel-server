@@ -1,4 +1,7 @@
 config.json
+tmp/
+*.tmp
+tmp.*
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,windows,macos,sublimetext,visualstudiocode,jetbrains+all,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,windows,macos,sublimetext,visualstudiocode,jetbrains+all,node

@@ -13,7 +13,9 @@
         "prettier": "^2.0.5"
     },
     "dependencies": {
+        "@antoniogiordano/hacli": "^1.0.2",
         "@hapi/hapi": "^20.0.0",
+        "hapi-auth-bearer-token": "^6.1.6",
         "joi": "^17.2.0",
         "pm2": "^4.4.0"
     },

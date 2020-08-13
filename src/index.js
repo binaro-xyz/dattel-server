@@ -7,6 +7,14 @@ const init = async () => {
         host: '0.0.0.0',
     });
 
+    // Bearer token auth
+    await server.register(require('hapi-auth-bearer-token'));
+    server.auth.strategy('simple', 'bearer-access-token', {
+        validate: async (request, token, h) => ({ isValid: token === config.auth_token, credentials: { token } }),
+    });
+    server.auth.default('simple');
+
+    // Routes
     server.route({
         method: 'GET',
         path: '/',
@@ -24,8 +32,9 @@ process.on('unhandledRejection', (err) => {
     process.exit(1);
 });
 
+let config;
 try {
-    require('../config.json');
+    config = require('../config.json');
 } catch (_) {
     console.error(
         'Invalid or missing configuration. Please copy `config-sample.json` to `config.json` and change the values as needed.'
