@@ -16,9 +16,17 @@ const init = async () => {
 
     // Routes
     server.route({
-        method: 'GET',
-        path: '/',
-        handler: (request, h) => 'Hello world!',
+        method: 'PUT',
+        path: '/site',
+        handler: require('./handlers/createSite'),
+        options: {
+            validate: {
+                payload: Joi.object({
+                    site_id: Joi.string().required().token(),
+                    domain: Joi.string().required().hostname(),
+                }),
+            },
+        },
     });
 
     await server.start();
