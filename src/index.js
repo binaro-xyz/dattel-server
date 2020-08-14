@@ -1,10 +1,21 @@
 const Hapi = require('@hapi/hapi');
 const Joi = require('joi');
+const j = require('./util/joi');
 
 const init = async () => {
     const server = Hapi.server({
         port: 3000,
         host: '0.0.0.0',
+        routes: {
+            validate: {
+                failAction: async function (request, h, err) {
+                    // TODO: Since we currently only have one (admin) user, it should be fine to always return the full
+                    // error in the response.
+                    // If the that changes in the future, see: https://github.com/hapijs/hapi/issues/3706
+                    throw err;
+                },
+            },
+        },
     });
 
     // Bearer token auth
@@ -22,12 +33,13 @@ const init = async () => {
         options: {
             validate: {
                 payload: Joi.object({
-                    site_id: Joi.string().required().token(),
+                    site_id: j.types.new_site_id.required(),
                     domain: Joi.string().required().hostname(),
                 }),
             },
         },
     });
+
     server.route({
         method: 'DELETE',
         path: '/site/{site_id}',
@@ -35,11 +47,86 @@ const init = async () => {
         options: {
             validate: {
                 params: Joi.object({
-                    site_id: Joi.string().required().token(),
+                    site_id: j.types.site_id.required(),
                 }),
                 payload: Joi.object({
                     delete_token: Joi.string().pattern(/[A-Za-z0-9_\-]{21}/),
                 }).allow(null),
+            },
+        },
+    });
+
+    server.route({
+        method: 'PUT',
+        path: '/site/{site_id}/deploy',
+        handler: require('./handlers/startDeploy'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    site_id: j.types.site_id.required(),
+                }),
+            },
+        },
+    });
+    server.route({
+        method: 'DELETE',
+        path: '/site/{site_id}/deploy',
+        handler: require('./handlers/cancelDeploy'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    site_id: j.types.site_id.required(),
+                }),
+            },
+        },
+    });
+    server.route({
+        method: 'PUT',
+        path: '/site/{site_id}/deploy/{deploy_id}/file/{dest_path*}',
+        handler: require('./handlers/uploadDeployFile'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    site_id: j.types.site_id.required(),
+                    deploy_id: j.types.deploy_id.required(),
+                    dest_path: Joi.string().pattern(/[^\0]/).required(),
+                }),
+                payload: Joi.object({
+                    path: Joi.string().required(),
+                    bytes: Joi.number().required(),
+                }),
+            },
+            payload: {
+                output: 'file',
+                maxBytes: 1024 * 1024 * 1024,
+                parse: true,
+            },
+        },
+    });
+    server.route({
+        method: 'DELETE',
+        path: '/site/{site_id}/deploy/{deploy_id}/file/{dest_path*}',
+        handler: require('./handlers/deleteDeployFile'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    site_id: j.types.site_id.required(),
+                    deploy_id: j.types.deploy_id.required(),
+                    dest_path: Joi.string().pattern(/[^\0]/).required(),
+                }),
+            },
+        },
+    });
+    server.route({
+        method: 'POST',
+        path: '/site/{site_id}/deploy/{deploy_id}/publish',
+        handler: require('./handlers/publishDeploy'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    site_id: j.types.site_id.required(),
+                    deploy_id: j.types.deploy_id.required(),
+                }),
             },
         },
     });
