@@ -28,6 +28,21 @@ const init = async () => {
             },
         },
     });
+    server.route({
+        method: 'DELETE',
+        path: '/site/{site_id}',
+        handler: require('./handlers/deleteSite'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    site_id: Joi.string().required().token(),
+                }),
+                payload: Joi.object({
+                    delete_token: Joi.string().pattern(/[A-Za-z0-9_\-]{21}/),
+                }).allow(null),
+            },
+        },
+    });
 
     await server.start();
     console.log('Server running on', server.info.uri);
