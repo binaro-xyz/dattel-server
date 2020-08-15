@@ -28,11 +28,7 @@ module.exports = {
                     t(`deploy '${deploy_id}' doesn't exist for site ${site_id}.`);
                 }
 
-                // Verify it is not the live deploy.
-                if (deploy_id === deploys.liveDeployDir(site_id)) t('deploying to the live deploy is not allowed.');
-
-                // Verify it is the deploy for which the lock was acquired. This is probably a little redundant but we
-                // might as well.
+                // Verify this is the deploy for which the lock was acquired.
                 if (deploy_id !== deploys.deployInProgressId(site_id)) t('this is a stale deploy.');
 
                 return deploy_id;
