@@ -35,6 +35,7 @@ module.exports = async (request, h) => {
                     {
                         handle: [
                             {
+                                '@id': `default-headers-${site_id}`,
                                 handler: 'headers',
                                 response: {
                                     add: {
@@ -42,7 +43,7 @@ module.exports = async (request, h) => {
                                     },
                                 },
                             },
-                            { handler: 'file_server', root: first_deploy_folder },
+                            { '@id': `files-${site_id}`, handler: 'file_server', root: first_deploy_folder },
                         ],
                     },
                 ],

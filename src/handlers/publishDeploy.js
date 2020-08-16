@@ -13,9 +13,8 @@ module.exports = async (request, h) => {
         // Tell Caddy to serve the new deploy.
         const previous_live_dir = await deploys.liveDeployDir(site_id);
         const new_live_dir = path.join(site_dir, deploy_id);
-        await caddy.PATCH(`/id/route-${site_id}/handle/0/routes/0/handle/1`, {
-            handler: 'file_server',
-            root: new_live_dir,
+        await caddy.POST(`/id/files-${site_id}/root`, JSON.stringify(new_live_dir), {
+            'Content-Type': 'application/json',
         });
 
         // Delete all deploys other than the current and previous live one and the lock.

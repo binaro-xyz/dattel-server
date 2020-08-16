@@ -10,10 +10,7 @@ module.exports = {
         if (!fs.existsSync(lock_file)) return undefined;
         return fs.readFileSync(lock_file).toString();
     },
-    liveDeployDir: (site_id) =>
-        caddy
-            .GET(`/id/route-${site_id}`)
-            .then((r) => r.handle[0].routes[0].handle.find((h) => h.handler === 'file_server').root),
+    liveDeployDir: (site_id) => caddy.GET(`/id/files-${site_id}`).then((r) => r.root),
 
     // See: https://nodejs.org/en/knowledge/file-system/security/introduction/#preventing-directory-traversal
     safePathInDeploy: (site_id, deploy_id, file_path) => {
