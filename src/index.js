@@ -57,6 +57,20 @@ const init = async () => {
     });
 
     server.route({
+        method: 'PATCH',
+        path: '/site/{site_id}/headers',
+        handler: require('./handlers/setSiteHeaders'),
+        options: {
+            validate: {
+                params: Joi.object({
+                    site_id: j.types.site_id.required(),
+                }),
+                payload: Joi.object({}).unknown(),
+            },
+        },
+    });
+
+    server.route({
         method: 'PUT',
         path: '/site/{site_id}/deploy',
         handler: require('./handlers/startDeploy'),

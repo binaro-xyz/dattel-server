@@ -30,23 +30,9 @@ module.exports = async (request, h) => {
         match: [{ host: [domain] }],
         handle: [
             {
+                '@id': `subroute-${site_id}`,
                 handler: 'subroute',
-                routes: [
-                    {
-                        handle: [
-                            {
-                                '@id': `default-headers-${site_id}`,
-                                handler: 'headers',
-                                response: {
-                                    add: {
-                                        'Cache-Control': ['public, max-age=0, must-revalidate'],
-                                    },
-                                },
-                            },
-                            { '@id': `files-${site_id}`, handler: 'file_server', root: first_deploy_folder },
-                        ],
-                    },
-                ],
+                routes: caddy.routeDefinition({ site_id, deploy_folder: first_deploy_folder, header_rules: {} }),
             },
         ],
         terminal: true,
