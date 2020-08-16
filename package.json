@@ -36,5 +36,10 @@
         "*.{js,css,scss,json}": [
             "prettier --write"
         ]
+    },
+    "nodemonConfig": {
+        "ignore": [
+            "tmp/*"
+        ]
     }
 }
