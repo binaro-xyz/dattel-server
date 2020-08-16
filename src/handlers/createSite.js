@@ -32,7 +32,7 @@ module.exports = async (request, h) => {
             {
                 '@id': `subroute-${site_id}`,
                 handler: 'subroute',
-                routes: caddy.routeDefinition({ site_id, deploy_folder: first_deploy_folder, header_rules: {} }),
+                routes: caddy.routeDefinition({ site_id, deploy_folder: first_deploy_folder }),
             },
         ],
         terminal: true,

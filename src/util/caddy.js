@@ -22,7 +22,7 @@ const PATCH = request('PATCH');
 const PUT = request('PUT');
 const DELETE = request('DELETE');
 
-const routeDefinition = ({ site_id, deploy_folder, header_rules }) => {
+const routeDefinition = ({ site_id, deploy_folder, header_rules = {}, redirect_rules = [] }) => {
     const custom_header_routes = Object.entries(header_rules).map(([path_matcher, headers]) => ({
         handle: [
             {
@@ -31,6 +31,16 @@ const routeDefinition = ({ site_id, deploy_folder, header_rules }) => {
             },
         ],
         match: [{ path: [path_matcher] }],
+    }));
+    const custom_redirect_routes = redirect_rules.map((r) => ({
+        handle: [
+            {
+                handler: 'static_response',
+                headers: { Location: [r.to.replace(':splat', '{http.request.uri}')] },
+                status_code: 301,
+            },
+        ],
+        match: [{ [r.host ? 'host' : 'path']: [r.host || r.path] }],
     }));
     return [
         ...custom_header_routes,
@@ -48,9 +58,10 @@ const routeDefinition = ({ site_id, deploy_folder, header_rules }) => {
                         },
                     },
                 },
-                { '@id': `files-${site_id}`, handler: 'file_server', root: deploy_folder },
             ],
         },
+        ...custom_redirect_routes,
+        { handle: [{ '@id': `files-${site_id}`, handler: 'file_server', root: deploy_folder }] },
     ];
 };
 

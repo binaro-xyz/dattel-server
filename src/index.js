@@ -65,7 +65,17 @@ const init = async () => {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
                 }),
-                payload: Joi.object({}).unknown(),
+                payload: Joi.object({
+                    headers: Joi.object().unknown(),
+                    redirects: Joi.array().items(
+                        Joi.object({
+                            status: Joi.number().allow(301, 302).required(),
+                            path: Joi.string().pattern(/^\/.+$/),
+                            host: Joi.string().hostname(),
+                            to: Joi.string(),
+                        })
+                    ),
+                }),
             },
         },
     });
