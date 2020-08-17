@@ -2,13 +2,42 @@ const config = require('../config.json');
 const caddy = require('./util/caddy');
 const fs = require('fs-extra');
 
+if (!process.argv[2]) {
+    console.error(
+        'Please specify the domain you want the API to be available as a parameter: node',
+        process.argv[1],
+        'api.mydomain.tld'
+    );
+    process.exit(1);
+}
+
 let caddy_conf = {
     apps: {
         http: {
             servers: {
                 srv0: {
                     listen: [':80', ':443'],
-                    routes: [],
+                    routes: [
+                        {
+                            match: [{ host: [process.argv[2]] }],
+                            handle: [
+                                {
+                                    handler: 'subroute',
+                                    routes: [
+                                        {
+                                            handle: [
+                                                {
+                                                    handler: 'reverse_proxy',
+                                                    upstreams: [{ dial: '127.0.0.1:3000' }],
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                            terminal: true,
+                        },
+                    ],
                 },
             },
         },
