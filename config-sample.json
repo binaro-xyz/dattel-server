@@ -1,5 +1,5 @@
 {
-    "deploy_folder": "/mnt/dattel-sites",
+    "deploy_folder": "/mnt/dattel-sites/sites",
     "auth_token": "NkZB32dKm7HLRd4mIHIylYHuzMGZLRa1",
     "caddy_api_url": "http://localhost:2019"
 }

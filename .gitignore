@@ -1,4 +1,5 @@
 config.json
+ecosystem.config.js
 tmp/
 *.tmp
 tmp.*
