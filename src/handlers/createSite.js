@@ -1,12 +1,13 @@
 const config = require('../../config.json');
 const r = require('../util/r');
 const caddy = require('../util/caddy');
+const { haveCommonElements } = require('../util/util');
 
 const fs = require('fs-extra');
 const path = require('path');
 
 module.exports = async (request, h) => {
-    const { site_id, domain } = request.payload;
+    const { site_id, domains } = request.payload;
     const site_dir = path.join(config.deploy_folder, site_id);
 
     // Sanity checks.
@@ -17,7 +18,7 @@ module.exports = async (request, h) => {
         .flat()
         .map((m) => m.host)
         .flat();
-    if (existing_domains.includes(domain)) return r(h, `Domain '${domain}' is already in use.`, 409);
+    if (haveCommonElements(existing_domains, domains)) return r(h, 'At least one domain is already in use.', 409);
 
     // Create a first deploy.
     const first_deploy_folder = path.join(site_dir, Date.now().toString());
@@ -27,7 +28,7 @@ module.exports = async (request, h) => {
     // Load the new site in Caddy.
     const route = {
         '@id': `route-${site_id}`,
-        match: [{ host: [domain] }],
+        match: [{ host: domains }],
         handle: [
             {
                 '@id': `subroute-${site_id}`,
@@ -39,5 +40,11 @@ module.exports = async (request, h) => {
     };
     await caddy.POST('/config/apps/http/servers/srv0/routes', route);
 
-    return r(h, `Successfully created site with ID '${site_id}' and domain '${domain}'.`, 201);
+    return r(
+        h,
+        `Successfully created site with ID '${site_id}' and domain${domains.length > 1 ? 's' : ''} ${domains
+            .map((d) => `'${d}'`)
+            .join(', ')}.`,
+        201
+    );
 };

@@ -34,7 +34,7 @@ const init = async () => {
             validate: {
                 payload: Joi.object({
                     site_id: j.types.new_site_id.required(),
-                    domain: Joi.string().required().hostname(),
+                    domains: Joi.array().items(Joi.string().hostname()).required(),
                 }),
             },
         },
