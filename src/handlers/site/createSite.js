@@ -1,7 +1,7 @@
-const config = require('../../config.json');
-const r = require('../util/r');
-const caddy = require('../util/caddy');
-const { haveCommonElements } = require('../util/util');
+const config = require('../../../config.json');
+const r = require('../../util/r');
+const caddy = require('../../util/caddy');
+const { haveCommonElements } = require('../../util/util');
 
 const fs = require('fs-extra');
 const path = require('path');

@@ -1,5 +1,5 @@
-const r = require('../util/r');
-const deploys = require('../util/deploys');
+const r = require('../../util/r');
+const deploys = require('../../util/deploys');
 const fs = require('fs-extra');
 
 module.exports = async (request, h) => {

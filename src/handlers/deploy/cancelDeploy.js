@@ -1,8 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
-const r = require('../util/r');
-const config = require('../../config.json');
-const { liveDeployDir } = require('../util/deploys');
+const r = require('../../util/r');
+const config = require('../../../config.json');
+const { liveDeployDir } = require('../../util/deploys');
 
 // TODO: Unlike the other deploy-related actions, this doesn't take a deploy ID but rather generically removes all
 // deploys other than the one that is currently live.

@@ -29,7 +29,7 @@ const init = async () => {
     server.route({
         method: 'PUT',
         path: '/site',
-        handler: require('./handlers/createSite'),
+        handler: require('./handlers/site/createSite'),
         options: {
             validate: {
                 payload: Joi.object({
@@ -43,7 +43,7 @@ const init = async () => {
     server.route({
         method: 'DELETE',
         path: '/site/{site_id}',
-        handler: require('./handlers/deleteSite'),
+        handler: require('./handlers/site/deleteSite'),
         options: {
             validate: {
                 params: Joi.object({
@@ -59,7 +59,7 @@ const init = async () => {
     server.route({
         method: 'PATCH',
         path: '/site/{site_id}/headers',
-        handler: require('./handlers/setSiteHeaders'),
+        handler: require('./handlers/site/setSiteHeaders'),
         options: {
             validate: {
                 params: Joi.object({
@@ -83,7 +83,7 @@ const init = async () => {
     server.route({
         method: 'PUT',
         path: '/site/{site_id}/deploy',
-        handler: require('./handlers/startDeploy'),
+        handler: require('./handlers/deploy/startDeploy'),
         options: {
             validate: {
                 params: Joi.object({
@@ -95,7 +95,7 @@ const init = async () => {
     server.route({
         method: 'DELETE',
         path: '/site/{site_id}/deploy',
-        handler: require('./handlers/cancelDeploy'),
+        handler: require('./handlers/deploy/cancelDeploy'),
         options: {
             validate: {
                 params: Joi.object({
@@ -107,7 +107,7 @@ const init = async () => {
     server.route({
         method: 'PUT',
         path: '/site/{site_id}/deploy/{deploy_id}/file/{dest_path*}',
-        handler: require('./handlers/uploadDeployFile'),
+        handler: require('./handlers/deploy/uploadDeployFile'),
         options: {
             validate: {
                 params: Joi.object({
@@ -130,7 +130,7 @@ const init = async () => {
     server.route({
         method: 'DELETE',
         path: '/site/{site_id}/deploy/{deploy_id}/file/{dest_path*}',
-        handler: require('./handlers/deleteDeployFile'),
+        handler: require('./handlers/deploy/deleteDeployFile'),
         options: {
             validate: {
                 params: Joi.object({
@@ -144,7 +144,7 @@ const init = async () => {
     server.route({
         method: 'POST',
         path: '/site/{site_id}/deploy/{deploy_id}/publish',
-        handler: require('./handlers/publishDeploy'),
+        handler: require('./handlers/deploy/publishDeploy'),
         options: {
             validate: {
                 params: Joi.object({

@@ -2,9 +2,9 @@ const fs = require('fs-extra');
 const path = require('path');
 const glob = require('glob');
 const hasha = require('hasha');
-const r = require('../util/r');
-const config = require('../../config.json');
-const { liveDeployDir } = require('../util/deploys');
+const r = require('../../util/r');
+const config = require('../../../config.json');
+const { liveDeployDir } = require('../../util/deploys');
 
 module.exports = async (request, h) => {
     const { site_id } = request.params;

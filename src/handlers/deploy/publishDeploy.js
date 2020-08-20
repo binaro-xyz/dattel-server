@@ -1,7 +1,7 @@
-const config = require('../../config.json');
-const deploys = require('../util/deploys');
-const caddy = require('../util/caddy');
-const r = require('../util/r');
+const config = require('../../../config.json');
+const deploys = require('../../util/deploys');
+const caddy = require('../../util/caddy');
+const r = require('../../util/r');
 const path = require('path');
 const fs = require('fs-extra');
 
