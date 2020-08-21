@@ -76,7 +76,12 @@ const routeDefinition = (site_id, { live_deploy_dir, domains = [], header_rules 
                         ],
                     },
                     ...custom_redirect_routes,
-                    { handle: [{ '@id': `files-${site_id}`, handler: 'file_server', root: live_deploy_dir }] },
+                    {
+                        handle: [
+                            { encodings: { gzip: {}, zstd: {} }, handler: 'encode' },
+                            { '@id': `files-${site_id}`, handler: 'file_server', root: live_deploy_dir },
+                        ],
+                    },
                 ],
             },
         ],
