@@ -58,6 +58,7 @@ const routeDefinition = (site_id, { live_deploy_dir, domains = [], header_rules 
                 '@id': `subroute-${site_id}`,
                 handler: 'subroute',
                 routes: [
+                    { handle: [{ handler: 'vars', root: live_deploy_dir }] },
                     ...custom_header_routes,
                     {
                         handle: [
@@ -79,7 +80,7 @@ const routeDefinition = (site_id, { live_deploy_dir, domains = [], header_rules 
                     {
                         handle: [
                             { encodings: { gzip: {}, zstd: {} }, handler: 'encode' },
-                            { '@id': `files-${site_id}`, handler: 'file_server', root: live_deploy_dir },
+                            { '@id': `files-${site_id}`, handler: 'file_server' },
                         ],
                     },
                 ],
