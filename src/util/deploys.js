@@ -1,4 +1,4 @@
-const caddy = require('./caddy');
+const sites = require('./sites');
 const fs = require('fs-extra');
 const path = require('path');
 const config = require('../../config.json');
@@ -10,7 +10,7 @@ module.exports = {
         if (!fs.existsSync(lock_file)) return undefined;
         return fs.readFileSync(lock_file).toString();
     },
-    liveDeployDir: (site_id) => caddy.GET(`/id/files-${site_id}`).then((r) => r.root),
+    liveDeployDir: (site_id) => sites.configForSite(site_id).live_deploy_dir,
 
     // See: https://nodejs.org/en/knowledge/file-system/security/introduction/#preventing-directory-traversal
     safePathInDeploy: (site_id, deploy_id, file_path) => {

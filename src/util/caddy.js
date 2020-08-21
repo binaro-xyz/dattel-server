@@ -1,6 +1,7 @@
 const bent = require('bent');
 
 const config = require('../../config.json');
+const sites = require('./sites');
 
 const request = (method, response_type = 'string') => {
     return function (...args) {
@@ -22,7 +23,14 @@ const PATCH = request('PATCH');
 const PUT = request('PUT');
 const DELETE = request('DELETE');
 
-const routeDefinition = ({ site_id, deploy_folder, header_rules = {}, redirect_rules = [] }) => {
+const domainsInUse = async () =>
+    (await GET('/config/apps/http/servers/srv0/routes'))
+        .map((r) => r.match)
+        .flat()
+        .map((m) => m.host)
+        .flat();
+
+const routeDefinition = (site_id, { live_deploy_dir, domains = [], header_rules = {}, redirect_rules = [] }) => {
     const custom_header_routes = Object.entries(header_rules).map(([path_matcher, headers]) => ({
         handle: [
             {
@@ -42,27 +50,49 @@ const routeDefinition = ({ site_id, deploy_folder, header_rules = {}, redirect_r
         ],
         match: [{ [r.host ? 'host' : 'path']: [r.host || r.path] }],
     }));
-    return [
-        ...custom_header_routes,
-        {
-            handle: [
-                {
-                    '@id': `default-headers-${site_id}`,
-                    handler: 'headers',
-                    response: {
-                        add: {
-                            'Cache-Control': ['public, max-age=0, must-revalidate'],
-                        },
-                        set: {
-                            Server: ['dattel-fueled Caddy'],
-                        },
+    return {
+        '@id': `route-${site_id}`,
+        match: [{ host: domains }],
+        handle: [
+            {
+                '@id': `subroute-${site_id}`,
+                handler: 'subroute',
+                routes: [
+                    ...custom_header_routes,
+                    {
+                        handle: [
+                            {
+                                '@id': `default-headers-${site_id}`,
+                                handler: 'headers',
+                                response: {
+                                    add: {
+                                        'Cache-Control': ['public, max-age=0, must-revalidate'],
+                                    },
+                                    set: {
+                                        Server: ['dattel-fueled Caddy'],
+                                    },
+                                },
+                            },
+                        ],
                     },
-                },
-            ],
-        },
-        ...custom_redirect_routes,
-        { handle: [{ '@id': `files-${site_id}`, handler: 'file_server', root: deploy_folder }] },
-    ];
+                    ...custom_redirect_routes,
+                    { handle: [{ '@id': `files-${site_id}`, handler: 'file_server', root: live_deploy_dir }] },
+                ],
+            },
+        ],
+        terminal: true,
+    };
+};
+
+const createSite = async (site_id) => {
+    const site_config = sites.configForSite(site_id);
+    const route_definition = routeDefinition(site_id, site_config);
+    await POST('/config/apps/http/servers/srv0/routes', route_definition);
+};
+const loadNewSiteConfig = async (site_id) => {
+    const site_config = sites.configForSite(site_id);
+    const route_definition = routeDefinition(site_id, site_config);
+    await PATCH(`/id/route-${site_id}`, route_definition);
 };
 
 module.exports = {
@@ -72,5 +102,9 @@ module.exports = {
     PUT,
     DELETE,
 
+    domainsInUse,
+
     routeDefinition,
+    createSite,
+    loadNewSiteConfig,
 };

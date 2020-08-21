@@ -1,6 +1,6 @@
 const config = require('../../../config.json');
 const deploys = require('../../util/deploys');
-const caddy = require('../../util/caddy');
+const dattel = require('../../util/dattel');
 const r = require('../../util/r');
 const path = require('path');
 const fs = require('fs-extra');
@@ -10,12 +10,10 @@ module.exports = async (request, h) => {
     const site_dir = path.join(config.deploy_folder, site_id);
 
     try {
-        // Tell Caddy to serve the new deploy.
-        const previous_live_dir = await deploys.liveDeployDir(site_id);
+        const previous_live_dir = deploys.liveDeployDir(site_id);
         const new_live_dir = path.join(site_dir, deploy_id);
-        await caddy.POST(`/id/files-${site_id}/root`, JSON.stringify(new_live_dir), {
-            'Content-Type': 'application/json',
-        });
+
+        await dattel.updateSiteConfig(site_id, { live_deploy_dir: new_live_dir });
 
         // Delete all deploys other than the current and previous live one and the lock.
         const old_deploys = fs

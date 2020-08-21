@@ -24,7 +24,7 @@ module.exports = async (request, h) => {
         fs.writeFileSync(lock_file, deploy_id);
 
         fs.ensureDirSync(deploy_dir);
-        fs.copySync(await liveDeployDir(site_id), deploy_dir, {
+        fs.copySync(liveDeployDir(site_id), deploy_dir, {
             preserveTimestamps: true,
         });
 

@@ -18,7 +18,7 @@ module.exports = async (request, h) => {
         return r(h, `Cannot cancel in-progress deploy for site ${site_id} as there is none.`, 404);
     }
 
-    const live_deploy_dir = path.resolve(await liveDeployDir(site_id));
+    const live_deploy_dir = path.resolve(liveDeployDir(site_id));
     const non_live_deploys = fs
         .readdirSync(site_dir, { withFileTypes: true })
         .filter((f) => f.isDirectory())

@@ -13,7 +13,7 @@ module.exports = async (request, h) => {
     const site_dir = path.join(config.deploy_folder, site_id);
 
     try {
-        const live_deploy_dir = await liveDeployDir(site_id);
+        const live_deploy_dir = liveDeployDir(site_id);
         const token_file = path.join(live_deploy_dir, '.dattel-delete-token');
 
         // To avoid unintentional deletes, create a file with a delete token in the webroot.
