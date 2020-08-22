@@ -34,7 +34,12 @@ const init = async () => {
             validate: {
                 payload: Joi.object({
                     site_id: j.types.new_site_id.required(),
+                    enable_cdn: Joi.boolean().default(true),
+                    // If `enable_cdn` is true, the domains will be added to the BunnyCDN zone, otherwise Caddy will
+                    // handle them.
                     domains: Joi.array().items(Joi.string().hostname()).required(),
+                    // 0 is standard, 1 is high volume.
+                    bunny_pricing_type: Joi.number().allow(0, 1).default(0),
                 }),
             },
         },

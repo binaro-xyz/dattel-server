@@ -1,6 +1,8 @@
 const config = require('../../../config.json');
 const r = require('../../util/r');
 const caddy = require('../../util/caddy');
+const sites = require('../../util/sites');
+const bunny = require('../../util/bunny');
 const { liveDeployDir } = require('../../util/deploys');
 
 const fs = require('fs-extra');
@@ -31,6 +33,12 @@ module.exports = async (request, h) => {
             // Validate the delete token.
             const correct_delete_token = fs.existsSync(token_file) && fs.readFileSync(token_file).toString();
             if (delete_token !== correct_delete_token) return r(h, 'Invalid delete token.', 403);
+        }
+
+        // Delete the CDN pull zone if the CDN is enabled.
+        const site_config = sites.configForSite(site_id);
+        if (site_config.bunny_pull_zone_id) {
+            await bunny.deletePullZone(site_config.bunny_pull_zone_id);
         }
 
         // Actually do the deletion.

@@ -1,6 +1,8 @@
 const config = require('../../../config.json');
 const deploys = require('../../util/deploys');
 const dattel = require('../../util/dattel');
+const sites = require('../../util/sites');
+const bunny = require('../../util/bunny');
 const r = require('../../util/r');
 const path = require('path');
 const fs = require('fs-extra');
@@ -24,6 +26,13 @@ module.exports = async (request, h) => {
 
         for (const dir of old_deploys) fs.removeSync(dir);
         fs.removeSync(path.join(site_dir, 'deploy_lock'));
+
+        // Purge the CDN cache if the CDN is enabled.
+        const site_config = sites.configForSite(site_id);
+        if (site_config.bunny_pull_zone_id) {
+            // TODO: We may want to only purge the changed files in the future.
+            await bunny.purgePullZoneCache(site_config.bunny_pull_zone_id);
+        }
 
         return r(h, `Successfully published deploy '${deploy_id}' for site '${site_id}'.`, 200);
     } catch (err) {

@@ -1,5 +1,7 @@
 {
     "deploy_folder": "/mnt/dattel-sites/sites",
     "auth_token": "NkZB32dKm7HLRd4mIHIylYHuzMGZLRa1",
-    "caddy_api_url": "http://localhost:2019"
+    "caddy_api_url": "http://localhost:2019",
+    "bunny_token": "89g303de-9e93-4d20-b5d0-f8b31b11ac8a4d4g563b-3cg3-47ef-i16f-l7b19801c23g",
+    "wildcard_domain": "dattel.mydomain.tld"
 }

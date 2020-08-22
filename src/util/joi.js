@@ -6,7 +6,7 @@ const t = (m) => {
     throw new Error(m);
 };
 
-const NEW_SITE_ID = Joi.string().token();
+const NEW_SITE_ID = Joi.string().pattern(/^[a-z0-9\-]+$/);
 
 module.exports = {
     types: {
