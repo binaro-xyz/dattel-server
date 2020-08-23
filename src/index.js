@@ -111,14 +111,14 @@ const init = async () => {
     });
     server.route({
         method: 'PUT',
-        path: '/site/{site_id}/deploy/{deploy_id}/file/{dest_path*}',
+        path: '/site/{site_id}/deploy/{deploy_id}/file/{base_64_dest_path*}',
         handler: require('./handlers/deploy/uploadDeployFile'),
         options: {
             validate: {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
                     deploy_id: j.types.deploy_id.required(),
-                    dest_path: Joi.string().pattern(/[^\0]/).required(),
+                    base_64_dest_path: Joi.string().pattern(/[^\0]/).required(),
                 }),
                 payload: Joi.object({
                     path: Joi.string().required(),
