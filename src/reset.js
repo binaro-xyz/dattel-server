@@ -18,6 +18,7 @@ let caddy_conf = {
                 srv0: {
                     listen: [':80', ':443'],
                     routes: [
+                        // Forward Let's Encrypt challenge requests to our second Caddy instance. *sigh*
                         {
                             match: [{ host: [process.argv[2]] }],
                             handle: [
@@ -26,7 +27,7 @@ let caddy_conf = {
                                     routes: [
                                         {
                                             handle: [
-                                                { handler: 'reverse_proxy', upstreams: [{ dial: '127.0.0.1:3000' }] },
+                                                { handler: 'reverse_proxy', upstreams: [{ dial: '127.0.0.1:8080' }] },
                                             ],
                                         },
                                     ],
