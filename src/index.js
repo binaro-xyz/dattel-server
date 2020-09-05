@@ -118,7 +118,7 @@ const init = async () => {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
                     deploy_id: j.types.deploy_id.required(),
-                    base_64_dest_path: Joi.string().pattern(/[^\0]/).required(),
+                    base_64_dest_path: Joi.string().base64().required(),
                 }),
                 payload: Joi.object({
                     path: Joi.string().required(),
@@ -141,7 +141,7 @@ const init = async () => {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
                     deploy_id: j.types.deploy_id.required(),
-                    dest_path: Joi.string().pattern(/[^\0]/).required(),
+                    base_64_dest_path: Joi.string().base64().required(),
                 }),
             },
         },
