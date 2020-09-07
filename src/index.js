@@ -134,7 +134,7 @@ const init = async () => {
     });
     server.route({
         method: 'DELETE',
-        path: '/site/{site_id}/deploy/{deploy_id}/file/{dest_path*}',
+        path: '/site/{site_id}/deploy/{deploy_id}/file/{base_64_dest_path*}',
         handler: require('./handlers/deploy/deleteDeployFile'),
         options: {
             validate: {
