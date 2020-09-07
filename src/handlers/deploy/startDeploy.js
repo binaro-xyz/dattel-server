@@ -28,13 +28,12 @@ module.exports = async (request, h) => {
             preserveTimestamps: true,
         });
 
-        // TODO: This can and should be parallelized for better speed.
-        const files = glob.sync('**/*', { cwd: deploy_dir, dot: true, nodir: true }).reduce(
-            (acc, cur) => ({
-                ...acc,
-                [cur]: hasha.fromFileSync(path.join(deploy_dir, cur), { algorithm: 'md5' }),
-            }),
-            {}
+        const paths = glob.sync('**/*', { cwd: deploy_dir, dot: true, nodir: true });
+        const files = {};
+        await Promise.all(
+            paths.map((p) => {
+                files[p] = hasha.fromFileSync(path.join(deploy_dir, p), { algorithm: 'md5' });
+            })
         );
 
         return r(h, { message: 'Successfully created new deploy.', deploy: { id: deploy_id, files } }, 201);
