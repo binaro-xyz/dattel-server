@@ -80,7 +80,7 @@ const routeDefinition = (site_id, { live_deploy_dir, domains = [], header_rules 
                     {
                         handle: [
                             { encodings: { gzip: {}, zstd: {} }, handler: 'encode' },
-                            { '@id': `files-${site_id}`, handler: 'file_server' },
+                            { '@id': `files-${site_id}`, handler: 'file_server', canonical_uris: false },
                         ],
                     },
                 ],
