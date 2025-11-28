@@ -106,7 +106,10 @@ const base_caddy_conf = {
         http: {
             servers: {
                 srv0: {
-                    listen: [':80', ':443'],
+                    // We explicitly _don't_ want to listen on `:80`, otherwise Caddy will not automatically redirect
+                    // HTTP to HTTPS
+                    // (https://vaibhavkaushal.com/posts/2025/Caddy-automatic-redirect-to-HTTPS-is-not-working).
+                    listen: [':443'],
                     routes: [
                         // Forward Let's Encrypt challenge requests to our second Caddy instance. *sigh*
                         {
