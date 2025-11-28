@@ -1,6 +1,18 @@
 const fs = require('fs-extra');
 const path = require('path');
 const config = require('../../config.json');
+const glob = require('glob');
+
+const getSites = () => {
+    const site_config_paths = glob.sync('*/site.json', { cwd: config.deploy_folder, dot: false });
+
+    return site_config_paths.reduce((acc, config_path) => {
+        const site_id = path.dirname(config_path);
+        const config = configForSite(site_id);
+        if (config) acc[site_id] = config;
+        return acc;
+    }, {});
+};
 
 siteExists = (site_id) => fs.existsSync(path.join(config.deploy_folder, site_id));
 siteConfigPath = (site_id) => path.join(config.deploy_folder, site_id, 'site.json');
@@ -20,6 +32,7 @@ updateConfigForSite = (site_id, overrides) => {
 };
 
 module.exports = {
+    getSites,
     siteExists,
     siteConfigPath,
     configForSite,

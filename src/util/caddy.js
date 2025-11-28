@@ -101,6 +101,63 @@ const loadNewSiteConfig = async (site_id) => {
     await PATCH(`/id/route-${site_id}`, route_definition);
 };
 
+const base_caddy_conf = {
+    apps: {
+        http: {
+            servers: {
+                srv0: {
+                    listen: [':80', ':443'],
+                    routes: [
+                        // Forward Let's Encrypt challenge requests to our second Caddy instance. *sigh*
+                        {
+                            match: [{ host: [config.api_domain] }],
+                            handle: [
+                                {
+                                    handler: 'subroute',
+                                    routes: [
+                                        {
+                                            handle: [
+                                                { handler: 'reverse_proxy', upstreams: [{ dial: '127.0.0.1:8080' }] },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
+                            terminal: true,
+                        },
+                    ],
+                    errors: {
+                        routes: [
+                            {
+                                handle: [
+                                    {
+                                        handler: 'subroute',
+                                        routes: [
+                                            { handle: [{ handler: 'rewrite', uri: '/{http.error.status_code}.html' }] },
+                                            { handle: [{ handler: 'file_server', pass_thru: true }] },
+                                            {
+                                                handle: [
+                                                    {
+                                                        handler: 'static_response',
+                                                        status_code: '{http.error.status_code}',
+                                                        body:
+                                                            '{http.error.status_text} (Error {http.error.status_code})',
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                                terminal: true,
+                            },
+                        ],
+                    },
+                },
+            },
+        },
+    },
+};
+
 module.exports = {
     GET,
     POST,
@@ -113,4 +170,6 @@ module.exports = {
     routeDefinition,
     createSite,
     loadNewSiteConfig,
+
+    base_caddy_conf,
 };
