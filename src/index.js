@@ -21,9 +21,38 @@ const init = async () => {
     // Bearer token auth
     await server.register(require('hapi-auth-bearer-token'));
     server.auth.strategy('simple', 'bearer-access-token', {
-        validate: async (request, token, h) => ({ isValid: token === config.auth_token, credentials: { token } }),
+        validate: async (request, token, h) => {
+            // The general `auth_token` gets the `root` scope, it can do everything.
+            if (token === config.auth_token) return { isValid: true, credentials: { token, scope: 'root' } };
+
+            // We also have site-specific deploy tokens that can only deploy to that site.
+            const site_id = request.params.site_id;
+            if (site_id) {
+                const deploy_token = config.deploy_tokens?.[site_id];
+                if ((deploy_token?.length || 0) > 20 && token === deploy_token)
+                    return { isValid: true, credentials: { token, scope: `deploy::${site_id}` } };
+            }
+
+            return { isValid: false, credentials: { token } };
+        },
     });
-    server.auth.default('simple');
+
+    // By default, all routes can only be accessed with a valid token with the `root` scope (i.e. the general
+    // `config.auth_token`).
+    server.auth.default({
+        strategy: 'simple',
+        access: {
+            scope: ['root'],
+        },
+    });
+    // Auth config for deploy methods. These can be accessed by the `root` scope (wíth the general `config.auth_token`)
+    // or with the site-specific `deploy-<site_id>` scope (with the site-specific token from `config.deploy_tokens`).
+    const deploy_auth = {
+        strategy: 'simple',
+        access: {
+            scope: ['root', 'deploy::{params.site_id}'],
+        },
+    };
 
     // Routes
     server.route({
@@ -66,6 +95,7 @@ const init = async () => {
         path: '/site/{site_id}/headers',
         handler: require('./handlers/site/setSiteHeaders'),
         options: {
+            auth: deploy_auth,
             validate: {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
@@ -90,6 +120,7 @@ const init = async () => {
         path: '/site/{site_id}/deploy',
         handler: require('./handlers/deploy/startDeploy'),
         options: {
+            auth: deploy_auth,
             validate: {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
@@ -102,6 +133,7 @@ const init = async () => {
         path: '/site/{site_id}/deploy',
         handler: require('./handlers/deploy/cancelDeploy'),
         options: {
+            auth: deploy_auth,
             validate: {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
@@ -114,6 +146,7 @@ const init = async () => {
         path: '/site/{site_id}/deploy/{deploy_id}/file/{base_64_dest_path*}',
         handler: require('./handlers/deploy/uploadDeployFile'),
         options: {
+            auth: deploy_auth,
             validate: {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
@@ -137,6 +170,7 @@ const init = async () => {
         path: '/site/{site_id}/deploy/{deploy_id}/file/{base_64_dest_path*}',
         handler: require('./handlers/deploy/deleteDeployFile'),
         options: {
+            auth: deploy_auth,
             validate: {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
@@ -151,6 +185,7 @@ const init = async () => {
         path: '/site/{site_id}/deploy/{deploy_id}/publish',
         handler: require('./handlers/deploy/publishDeploy'),
         options: {
+            auth: deploy_auth,
             validate: {
                 params: Joi.object({
                     site_id: j.types.site_id.required(),
