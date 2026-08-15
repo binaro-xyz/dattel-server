@@ -5,7 +5,6 @@ const config = require('../../config.json');
 
 const ax = _axios.create({ baseURL: 'https://bunnycdn.com/api' });
 ax.defaults.headers.common['AccessKey'] = config.bunny_token;
-ax.defaults.raxConfig = { instance: ax };
 rax.attach(ax);
 
 const createPullZone = (name, pricing_type, origin_url) =>
